@@ -8,9 +8,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.edu.uan.android.ejemplofinal1010.models.Cat
+import co.edu.uan.android.ejemplofinal1010.services.CatApi
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.koushikdutta.ion.Ion
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -28,20 +34,21 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
      * Metodo de logica de negocio, llama el API
      */
     fun loadCats() {
-        val context = getApplication<Application>().applicationContext
-        Ion.with(context) // llama el API
-            .load("https://api.thecatapi.com/v1/images/search?limit=1&api_key=REPLACE_ME")
-            .asString()
-            .setCallback { e, result ->
-                // Procesa el resultado de llamar al API
-                Log.d("CATAPI","$result")
-                // CONvertir a objetos de Kotlin usando Gson
-                var gson = Gson()
-                var data = gson.fromJson(result, Array<Cat>::class.java)
-                // Actualizar los valores en el view model con lo que obtuvo desde el API
+        val api = CatApi.getInstance()
+        val search = api.search()
+        search.enqueue(object: Callback<List<Cat>> {
+            override fun onResponse(call: Call<List<Cat>>, response: Response<List<Cat>>) {
                 val list = mutableListOf<Cat>()
-                list.addAll(data)
+                if(response.body()!=null) {
+                    list.addAll(response.body()!!)
+                }
                 catsList.setValue(list)
             }
+
+            override fun onFailure(call: Call<List<Cat>>, t: Throwable) {
+                Log.e("CATAPI","Error del API $t")
+            }
+
+        })
     }
 }
