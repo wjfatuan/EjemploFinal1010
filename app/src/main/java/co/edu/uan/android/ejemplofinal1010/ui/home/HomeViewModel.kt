@@ -12,6 +12,7 @@ import co.edu.uan.android.ejemplofinal1010.services.CatApi
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.koushikdutta.ion.Ion
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -35,20 +36,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
      */
     fun loadCats() {
         val api = CatApi.getInstance()
-        val search = api.search()
-        search.enqueue(object: Callback<List<Cat>> {
-            override fun onResponse(call: Call<List<Cat>>, response: Response<List<Cat>>) {
-                val list = mutableListOf<Cat>()
-                if(response.body()!=null) {
-                    list.addAll(response.body()!!)
-                }
-                catsList.setValue(list)
-            }
-
-            override fun onFailure(call: Call<List<Cat>>, t: Throwable) {
-                Log.e("CATAPI","Error del API $t")
-            }
-
-        })
+        viewModelScope.launch {
+            val list = mutableListOf<Cat>()
+            list.addAll(api.search(4))
+            catsList.setValue(list)
+        }
     }
 }

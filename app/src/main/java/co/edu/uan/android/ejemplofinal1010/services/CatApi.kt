@@ -5,11 +5,16 @@ import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface CatApi {
 
-    @GET("/v1/images/search?limit=10")
-    fun search(): Call<List<Cat>>
+    @GET("/v1/images/search")
+    suspend fun search(@Query("limit") n: Int): List<Cat>
+
+    @POST("/v1/images/")
+    fun createCat(cat: Cat)
 
     companion object {
         fun getInstance() : CatApi {

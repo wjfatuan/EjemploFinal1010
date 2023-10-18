@@ -38,6 +38,7 @@ class HomeFragment : Fragment() {
 
         homeViewModel.loadCats() // 1. invocar logica de negocio
         homeViewModel.catsList.observe(viewLifecycleOwner) {
+            Log.d("CATAPI","Cats list: $it")
             // 2. observamos cambios en el viewmodel. si cambian , refrescamos la pantalla
             showCatImage(it.get(0).url) // si los datas cambian, mostramos el nuevo gato
         }
