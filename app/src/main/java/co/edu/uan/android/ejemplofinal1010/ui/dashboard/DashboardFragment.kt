@@ -28,9 +28,11 @@ class DashboardFragment : Fragment() {
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        dashboardViewModel.loadCatsFromDatabase()
+
         val textView: TextView = binding.textDashboard
-        dashboardViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        dashboardViewModel.catUrlList.observe(viewLifecycleOwner) {
+            textView.text = it.toString()
         }
         return root
     }
